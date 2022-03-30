@@ -1,0 +1,13 @@
+{
+	"name": "PIP Mode",
+	"description": "Adding PIP Mode for questions",
+	"uri": "",
+	"version": "1.0",
+	"date": "2022-03-30",
+	"author": "SHAIK MASTHAN",
+	"author_uri": "",
+	"license": "GPLv2",
+	"min_q2a": "1.7.5",
+	"load_order": "after_db_init"
+}
+
