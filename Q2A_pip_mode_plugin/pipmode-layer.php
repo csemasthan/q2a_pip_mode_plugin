@@ -26,7 +26,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 		qa_html_theme_base::head_script();
 		$enabled_plugins = qa_opt('enabled_plugins');
 				
-		if(strpos($enabled_plugins, 'pipmode') !== false && qa_is_logged_in() ) {
+		if(qa_is_logged_in() ) {
 		
 			if($this->template === 'question')
 		{
