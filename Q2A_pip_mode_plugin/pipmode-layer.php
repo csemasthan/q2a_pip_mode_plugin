@@ -2,21 +2,92 @@
 
 class qa_html_theme_layer extends qa_html_theme_base {
 
-			
+	public  $question_content;
+	public $answer_content=array();	
+	public  $load_pip_by_default=0;
+	
+	function doctype()
+	{
+		if($this->template == 'account'){
+			$pipcheckbox_form = $this->pip_form_generate();			
+			if($pipcheckbox_form){
+				$this->content['form_pipcheckbox'] = $pipcheckbox_form;
+			}
+		}
+		qa_html_theme_base::doctype();
+	}
+	
+	function pip_form_generate(){
+		if($handle = qa_get_logged_in_handle()) {
+			require_once QA_INCLUDE_DIR . 'db/metas.php';
+			$userid = qa_get_logged_in_userid();
+			if (qa_clicked('pipsettings_save')) {
+			$field_value = empty(qa_post_text('pip_check_box'))?"0":"1";
+			qa_db_usermeta_set($userid, 'PIP', $field_value ) ;
+			qa_redirect($this->request,array('ok'=>qa_lang_html('admin/options_saved')));
+			}
+		}
+		$ok = qa_get('ok')?qa_get('ok'):null;
+		$fields = array();
+		$fields['pip_check_box'] = array(
+				'label' => "Enable PIP mode of Question Automatically",
+				'tags' => 'NAME="pip_check_box"',
+				'type' => 'checkbox',
+				'value' => qa_db_usermeta_get($userid, 'PIP'),
+				);
+		
+			$form=array(
 
-// code to add Button in the question
+					'ok' => ($ok && !isset($error)) ? $ok : null,
 
-	public function q_view_buttons($q_view)
+					'style' => 'tall',
+
+					'title' => "PIP BOX DEFAULT OPTION",
+
+					'tags' =>  'action="" method="POST"',
+
+					'fields' => $fields,
+					
+					'label' => "PIP CHECK BOX FORM",
+
+					'buttons' => array(
+						array(
+							'label' => qa_lang_html('main/save_button'),
+							'tags' => 'NAME="pipsettings_save"',
+						     ),
+						),
+				   );
+			return $form;	
+	}	
+
+	public function a_item_buttons($a_item)
 	{
 		if($this -> template == 'question')
 		{
 		if(qa_is_logged_in())
 		{
-			$q_view['form']['buttons']['q_pip'] = array("tags" => 'data-postid="'.$q_view['raw']['postid'].'"  id="q_pip"', "label" => "PIP BOX", "popup" => "Show question in PIP MODE");
+			$answer_content=$a_item['content'];
+			$answer_id=explode('"',$answer_content)[1];
+			$a_item['form']['buttons']['a_pip'] = array("tags" => 'id="APIP_'.$answer_id.'"', "label" => "PIP BOX", "popup" => "Show answer in PIP MODE");
 
+			
+			$this->output('
+<script type="text/javascript">
+$(document).ready(function()
+{
+
+$("#APIP_'.$answer_id.'").attr("type", "button"); 
+$("#APIP_'.$answer_id.'").click( function clicked_Answer(){
+//alert('.$answer_id.');
+CONTENT=\''.$answer_content.'\';
+visible_item = document.getElementById("APIP_'.$answer_id.'");
+Create_PIPBOX(CONTENT,"ANSWER");
+});
+});
+</script>');	
+		}		
 		}
-		}
-		qa_html_theme_base::q_view_buttons($q_view);
+		qa_html_theme_base::a_item_buttons($a_item);
 
 	}
 	
@@ -24,52 +95,44 @@ class qa_html_theme_layer extends qa_html_theme_base {
 	function head_script()
 	{
 		qa_html_theme_base::head_script();
-		$enabled_plugins = qa_opt('enabled_plugins');
-				
-		if(qa_is_logged_in() ) {
-		
-			if($this->template === 'question')
-		{
-		
-			//$this->output($enabled_plugins);
+		$this->output('
+<script>
+	var visible_item = document.querySelector(".qa-q-view-content");
+	var CONTENT;
+	var Header;
+	
 
-			$this->output('
-<script type="text/javascript">
-$(document).ready(function()
-{
-	// prevent submit
-	$("#q_pip").attr("type", "button"); 
+function Clicked_Question(){
+	if(i==0){
+		alert("Question will be open in PIP mode once it is out of visibility ");
+		i=1;
+	}
+	visible_item=document.querySelector(".qa-q-view-content");
+	CONTENT=document.getElementsByClassName("qa-q-view-content")[0].innerHTML;
+	Header="QUESTION";
+	Create_PIPBOX(CONTENT,Header);
+	}
 	
-	var QUESTION_CONTENT = document.getElementsByClassName("qa-q-view-content")[0]; 
-	var i=0;
-	$("#q_pip").click( function Create_PIPBOX(){  
-	
-		var QUESTION_PIPBOX = document.createElement("div");
-		if(i==0){
-			alert("Question will be open in PIP mode once it is out of visibility ");
-			i=1;
-		}
-    		QUESTION_PIPBOX.setAttribute(\'id\',\'PIPBOX\');
-    		QUESTION_PIPBOX.innerHTML = "<div id=\"PIPBOX_Header\"></div><div id=\"PIPBOX_Content\"></div>";
-    		document.body.append(QUESTION_PIPBOX);
-    		document.getElementById("PIPBOX_Header").innerHTML="PIP MODE of Question<span id=\'close\' style=\"float:right;\">X</span>";
-		document.getElementById("PIPBOX_Content").innerHTML=QUESTION_CONTENT.innerHTML;
-		document.getElementById("close").onclick=function Close_PIPBOX(){document.getElementById("PIPBOX").remove();};
+	function Create_PIPBOX($content,$header){  
+		CONTENT = $content;
+		Header = $header;  
+		var PIPBOX = document.createElement("div");
+    		PIPBOX.setAttribute("id","PIPBOX");
+    		PIPBOX.innerHTML = "<div id=\"PIPBOX_Header\"></div><div id=\"PIPBOX_Content\"></div>";
+    		document.body.append(PIPBOX);
+    		document.getElementById("PIPBOX_Header").innerHTML="PIP MODE of "+Header+"<span id=\'close\' style=\"float:right;\">X</span>";
+		document.getElementById("PIPBOX_Content").innerHTML=CONTENT;
+		document.getElementById("close").onclick=function Close_PIPBOX(){document.getElementById("PIPBOX_Content").remove();document.getElementById("PIPBOX").remove();};
 		
 		dragElement(document.getElementById("PIPBOX"));
-/*
-	1. creating Main division
-	2. setting id for the Main Division, for further reference
-	3. Creating two divisions in the Main division, 
-	4. Display the main division on the page
-	5. Content of the Division_Header
-	6. Content of the Division_Content
-	7. Script for Deleting the Main division from the page.
-	8. Making the Main division movable.
-*/
+		
+	if(document.getElementById("PIPBOX"))
+	{
+		document.getElementById("PIPBOX").style.width="30%";
+		document.getElementById("PIPBOX").style.height="auto";
 
 	}
-);
+}
 
 // Well known Draggable function for an element script adding
 function dragElement(elmnt){
@@ -114,6 +177,8 @@ function dragElement(elmnt){
 
 // Well known VISIBLE of an element script adding
 function isInViewport(el) {
+	if(!el)
+		return ;
     const rect = el.getBoundingClientRect();
     return (
         rect.top >= 0 &&
@@ -125,26 +190,48 @@ function isInViewport(el) {
 }
 
 
-const question_visible = document.querySelector(".qa-q-view-content");
+
+$(document).ready(function()
+{
+
+	// prevent submit
+	$("#q_pip").attr("type", "button"); 
+	$("#q_pip").click( function Click(){Clicked_Question();}	);
 
 // Attaching the VISIBLE script to Event scroll
 document.addEventListener("scroll", function () {
-    isInViewport(question_visible) ? 
-	(document.getElementById("PIPBOX") === null ? "": document.getElementById("PIPBOX").style.visibility="hidden") 
-	: (document.getElementById("PIPBOX") === null ? "": (document.getElementById("PIPBOX").style.visibility="visible",document.getElementById("PIPBOX_Content").innerHTML=QUESTION_CONTENT.innerHTML));
-	
+    if(isInViewport(visible_item))
+    {
+		if(document.getElementById("PIPBOX") === null)
+		{}
+		else{
+		document.getElementById("PIPBOX").style.visibility="hidden";
+		}
+	}
+	else{
+		if(document.getElementById("PIPBOX") === null)
+		{}
+		else{
+			document.getElementById("PIPBOX").style.visibility="visible";
+			document.getElementById("PIPBOX_Content").innerHTML=CONTENT;
+		}
 
-}, {
+}}, {
     passive: true
 });
 });
 
 
 </script>
-<style type="text/css">
+			
+			');
+			
+		$this->output('
+<style>
+
 #PIPBOX{
-top:2px;
-right:2px;
+top:40px;
+right:5px;
 z-index:9999;
 border:1px solid LightGray;
 width:30%;
@@ -178,11 +265,48 @@ right:25px;
 position:relative;
 cursor:pointer;
 }
+
 </style>
-					');
-		}
-		}
+		');	
 	}
 	 // end head_script
 
+
+
+// code to add Button in the question
+
+	public function q_view_buttons($q_view)
+	{
+		if($this -> template == 'question')
+		{
+		if(qa_is_logged_in())
+		{
+			$q_view['form']['buttons']['q_pip'] = array("tags" => 'data-postid="'.$q_view['raw']['postid'].'"  id="q_pip"', "label" => "PIP BOX", "popup" => "Show question in PIP MODE");
+
+		}
+		require_once QA_INCLUDE_DIR . 'db/metas.php';
+		$userid = qa_get_logged_in_userid();
+		
+		settype($load_pip_by_default,'integer');
+			$load_pip_by_default=qa_db_usermeta_get($userid, 'PIP');
+		if($load_pip_by_default==1)
+				{
+			$this->output('
+<script type="text/javascript">
+$(document).ready(function()
+{
+i=1;
+Clicked_Question();
+});
+</script>');	
+		
+		}
+		
+		qa_html_theme_base::q_view_buttons($q_view);
+		
+
+		
+				}
+
+	}
 }
