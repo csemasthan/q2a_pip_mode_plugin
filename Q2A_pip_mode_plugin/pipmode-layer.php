@@ -95,6 +95,10 @@ Create_PIPBOX(CONTENT,"ANSWER");
 	function head_script()
 	{
 		qa_html_theme_base::head_script();
+		if($this -> template == 'question')
+		{
+		if(qa_is_logged_in())
+		{
 		$this->output('
 <script>
 	var visible_item = document.querySelector(".qa-q-view-content");
@@ -268,6 +272,8 @@ cursor:pointer;
 
 </style>
 		');	
+	}
+	}
 	}
 	 // end head_script
 
