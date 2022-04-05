@@ -308,11 +308,12 @@ Clicked_Question();
 		
 		}
 		
-		qa_html_theme_base::q_view_buttons($q_view);
+		
 		
 
 		
 				}
+				qa_html_theme_base::q_view_buttons($q_view);
 
 	}
 }
