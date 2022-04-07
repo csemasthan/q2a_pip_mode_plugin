@@ -251,7 +251,7 @@ document.addEventListener("scroll", function () {
 <style>
 
 #PIPBOX{
-top:40px;
+top:45px;
 right:5px;
 z-index:9999;
 border:1px solid LightGray;
