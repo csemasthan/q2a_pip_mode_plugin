@@ -2,7 +2,7 @@
 
 class qa_html_theme_layer extends qa_html_theme_base {
 
-	public  $question_content,$i=0;
+	public  $question_content;
 	public $answer_content=array();	
 	public  $load_pip_by_default=0;
 	
