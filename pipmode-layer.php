@@ -2,7 +2,7 @@
 
 class qa_html_theme_layer extends qa_html_theme_base {
 
-	public  $question_content;
+	public  $question_content,$i=0;
 	public $answer_content=array();	
 	public  $load_pip_by_default=0;
 	
@@ -67,22 +67,25 @@ class qa_html_theme_layer extends qa_html_theme_base {
 		if(qa_is_logged_in())
 		{
 			$answer_content=$a_item['content'];
+			
 			$answer_id=explode('"',$answer_content)[1];
 			$a_item['form']['buttons']['a_pip'] = array("tags" => 'id="APIP_'.$answer_id.'"', "label" => "PIP BOX", "popup" => "Show answer in PIP MODE");
 
-			
 			$this->output('
 <script type="text/javascript">
+
 $(document).ready(function()
 {
-
+var answer_number_on_the_page=get_answer_number();
 $("#APIP_'.$answer_id.'").attr("type", "button"); 
+
 $("#APIP_'.$answer_id.'").click( function clicked_Answer(){
-//alert('.$answer_id.');
-CONTENT=\''.$answer_content.'\';
+
+CONTENT=document.querySelectorAll(".qa-a-item-content")[answer_number_on_the_page].innerHTML;
 Header="ANSWER";
-visible_item = document.getElementById("APIP_'.$answer_id.'");
+visible_item = document.querySelectorAll(".qa-a-item-content")[answer_number_on_the_page];
 Create_PIPBOX(CONTENT,Header);
+
 });
 });
 </script>');	
@@ -105,7 +108,10 @@ Create_PIPBOX(CONTENT,Header);
 	var visible_item = document.querySelector(".qa-q-view-content");
 	var CONTENT;
 	var Header;
-	
+	var answer_number=0;
+function get_answer_number(){
+	return answer_number++;
+}
 function Clicked_Question(){
 	if(i==0){
 		alert("Question will be open in PIP mode once it is out of visibility ");
