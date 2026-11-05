@@ -130,12 +130,12 @@ function Create_PIPBOX($content,$header){
 	{
 		var PIPBOX = document.createElement("div");
     		PIPBOX.setAttribute("id","PIPBOX");
-    		PIPBOX.innerHTML = "<div id=\"PIPBOX_Header\"></div><div id=\"PIPBOX_Content\"></div>";
+    		PIPBOX.innerHTML = "<div id=\\"PIPBOX_Header\\"></div><div id=\\"PIPBOX_Content\\"></div>";
     		document.body.append(PIPBOX);
 		dragElement(document.getElementById("PIPBOX"));
 	}
 
-	document.getElementById("PIPBOX_Header").innerHTML="PIP MODE of "+Header+"<span id=\'close\' style=\"float:right;\">X</span>";
+	document.getElementById("PIPBOX_Header").innerHTML="PIP MODE of "+Header+"<span id=\'close\' style=\\"float:right;\\">X</span>";
 	document.getElementById("PIPBOX_Content").innerHTML=CONTENT;
 	document.getElementById("close").onclick=function (){Close_PIPBOX();};
 		
@@ -214,6 +214,7 @@ $(document).ready(function()
 
 	// prevent submit
 	$("#q_pip").attr("type", "button"); 
+	i=0;
 	$("#q_pip").click( function Click(){Clicked_Question();}	);
 
 // Attaching the VISIBLE script to Event scroll
@@ -251,42 +252,98 @@ document.addEventListener("scroll", function () {
 <style>
 
 #PIPBOX{
-top:45px;
-right:5px;
-z-index:9999;
-border:1px solid LightGray;
-width:30%;
-height:auto;
-border-radius:5px;
-overflow:auto;
-resize:both;
-position:fixed;
-visibility:hidden;
+	top:45px;
+	right:5px;
+	z-index:9999;
+	border:1px solid #dfe6ee;
+	width:30%;
+	height:auto;
+	border-radius:10px;
+	overflow:hidden;
+	resize:both;
+	position:fixed;
+	visibility:hidden;
+	background:#f8fafc;
+	color:#111827;
+	box-shadow:0 14px 32px rgba(15, 23, 42, 0.12);
+	font-family:Arial, sans-serif;
 	/* initially making hidden, after that it will be Visible depends upon question visibility */
 }
 
+html[data-theme="dark"] #PIPBOX{
+	background:#111827;
+	border-color:#374151;
+	color:#f3f4f6;
+	box-shadow:0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
 #PIPBOX_Header{
-background-color: LightGray;
-border-bottom: 1px solid white;
-text-align: center;
-cursor: move;
-line-height:3;
+	background:linear-gradient(180deg, #edf2f7 0%, #e2e8f0 100%);
+	border-bottom:1px solid #dfe6ee;
+	text-align:center;
+	cursor:move;
+	line-height:1.4;
+	padding:10px 12px;
+	font-weight:700;
+	font-size:13px;
+	position:relative;
+}
+
+html[data-theme="dark"] #PIPBOX_Header{
+	background:linear-gradient(180deg, #1f2937 0%, #17212d 100%);
+	border-bottom-color:#374151;
+	color:#f3f4f6;
 }
 
 #PIPBOX_Content{
-background-color: LightGray;
-text-indent: 10px;
-padding:5px;
+	background:#ffffff;
+	color:#1f2937;
+	text-indent:0;
+	padding:12px 14px;
+	line-height:1.6;
+	max-height:70vh;
+	overflow:auto;
+	word-break:break-word;
+}
+
+html[data-theme="dark"] #PIPBOX_Content{
+	background:#0f172a;
+	color:#f3f4f6;
+}
+
+#PIPBOX_Content *{
+	color:inherit;
 }
 
 #close{
-top:0px;
-text-align: right;
-right:25px;
-position:relative;
-cursor:pointer;
+	top:0;
+	text-align:center;
+	right:0;
+	position:absolute;
+	cursor:pointer;
+	width:22px;
+	height:22px;
+	border-radius:50%;
+	line-height:22px;
+	font-size:12px;
+	font-weight:700;
+	background:rgba(15, 23, 42, 0.06);
+	color:#374151;
+	transition:background 0.2s ease;
 }
 
+#close:hover{
+	background:rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="dark"] #close{
+	background:rgba(148, 163, 184, 0.12);
+	color:#f3f4f6;
+}
+
+html[data-theme="dark"] #close:hover{
+	background:rgba(148, 163, 184, 0.2);
+}
 </style>
 		');	
 	}
