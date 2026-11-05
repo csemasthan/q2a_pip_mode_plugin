@@ -69,7 +69,7 @@ class qa_html_theme_layer extends qa_html_theme_base {
 			$answer_content=$a_item['content'];
 			
 			$answer_id=explode('"',$answer_content)[1];
-			$a_item['form']['buttons']['a_pip'] = array("tags" => 'id="APIP_'.$answer_id.'"', "label" => "PIP BOX", "popup" => "Show answer in PIP MODE");
+			$a_item['form']['buttons']['a_pip'] = array("tags" => 'id="APIP_'.$answer_id.'"', "label" => "Pip Box", "popup" => "Show answer in PIP MODE");
 
 			$this->output('
 <script type="text/javascript">
@@ -105,7 +105,7 @@ Create_PIPBOX(CONTENT,Header);
 		{
 		$this->output('
 <script>
-	var visible_item = document.querySelector(".qa-q-view-content");
+	var visible_item = document.querySelector(".qa-q-view-content, .qa-q-view-content1");
 	var CONTENT;
 	var Header;
 	var answer_number=0;
@@ -117,8 +117,11 @@ function Clicked_Question(){
 		alert("Question will be open in PIP mode once it is out of visibility ");
 		i=1;
 	}
-	visible_item=document.querySelector(".qa-q-view-content");
-	CONTENT=document.getElementsByClassName("qa-q-view-content")[0].innerHTML;
+	visible_item=document.querySelector(".qa-q-view-content,.qa-q-view-content1");
+	var elem = document.getElementsByClassName("qa-q-view-content")[0];
+    if(!elem)
+	  elem = document.getElementsByClassName("qa-q-view-content1")[0];
+	CONTENT=elem.innerHTML;
 	Header="QUESTION";
 	Create_PIPBOX(CONTENT,Header);
 }
@@ -361,7 +364,7 @@ html[data-theme="dark"] #close:hover{
 		{
 		if(qa_is_logged_in())
 		{
-			$q_view['form']['buttons']['q_pip'] = array("tags" => 'data-postid="'.$q_view['raw']['postid'].'"  id="q_pip"', "label" => "PIP BOX", "popup" => "Show question in PIP MODE");
+			$q_view['form']['buttons']['q_pip'] = array("tags" => 'data-postid="'.$q_view['raw']['postid'].'"  id="q_pip"', "label" => "Pip Box", "popup" => "Show question in PIP MODE");
 
 		}
 		require_once QA_INCLUDE_DIR . 'db/metas.php';
@@ -373,11 +376,11 @@ html[data-theme="dark"] #close:hover{
 				{
 			$this->output('
 <script type="text/javascript">
-$(document).ready(function()
-{
-i=1;
-Clicked_Question();
-});
+	$(document).ready(function()
+	{
+		i=1;
+		Clicked_Question();
+	});
 </script>');	
 		
 		}
